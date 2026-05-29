@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>墨渊Maris小站</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=LXGW+WenKai+TC:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+/* ===== 全局 ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: "Inter", "Source Han Sans CN", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #eef7ee;
+  color: #333;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+/* ===== 光晕背景 ===== */
+#glow-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: radial-gradient(
+    600px circle at var(--x, 50%) var(--y, 50%),
+    rgba(140, 220, 160, 0.45),
+    transparent 60%
+  );
+  transition: background-position 0.1s;
+}
+
+/* ===== 几何背景 ===== */
+canvas#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+
+/* ===== 容器 ===== */
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 30px 20px;
+}
+
+/* ===== 头像区域 ===== */
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.avatar-container {
+  display: inline-block;
+  position: relative;
+}
+
+.avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #6bc46b;
+  box-shadow: 0 0 25px rgba(107, 196, 107, 0.5);
+  animation: float 4s ease-in-out infinite;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 10;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+}
+
+/* 7次旋转 */
+.avatar.spin {
+  animation: spin-and-refresh 2s ease-in-out forwards;
+}
+
+/* 49次掉落 */
+.avatar.fall {
+  animation: fall-to-bottom 2.5s ease-in forwards;
+}
+
+@keyframes spin-and-refresh {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes fall-to-bottom {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  60% { transform: translateY(calc(100vh - 150px)) rotate(20deg); opacity: 1; }
+  100% { transform: translateY(calc(100vh - 150px)) rotate(20deg); opacity: 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* 站名 */
+.site-title {
+  font-family: "LXGW WenKai TC", "STKaiti", "KaiTi", serif;
+  margin-top: 12px;
+  font-size: 2rem;
+  color: #3a7a3a;
+  letter-spacing: 2px;
+}
+
+/* ===== 主体布局 ===== */
+.main {
+  display: flex;
+  gap: 30px;
+}
+
+/* ===== 左侧 ===== */
+.sidebar {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+.sidebar h2 {
+  font-size: 1.3rem;
+  color: #4a944a;
+  margin-bottom: 16px;
+}
+#articleList {
+  list-style: none;
+  padding: 0;
+}
+#articleList li {
+  padding: 12px 15px;
+  border-bottom: 1px solid #e8f5e8;
+  cursor: pointer;
+  font-size: 0.95rem;
+  position: relative;
+  transition: all 0.3s ease;
+  background-color: rgba(58, 122, 58, 0.03);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+#articleList li:hover {
+  background: rgba(58, 122, 58, 0.06);
+}
+#articleList li::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: #3a7a3a;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+#articleList li:hover::after {
+  transform: scaleX(1);
+}
+
+/* ===== 右侧 ===== */
+.content {
+  flex: 2;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(58, 122, 58, 0.1);
+  color: #3a7a3a;
+  border: 1px solid rgba(58, 122, 58, 0.3);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  display: none;
+  z-index: 10;
+}
+.back-button:hover {
+  background: rgba(58, 122, 58, 0.2);
+  transform: translateX(-2px);
+}
+
+.content h2 {
+  font-family: "LXGW WenKai TC", "STKaiti", "KaiTi", serif;
+  color: #3a7a3a;
+  font-size: 1.3rem;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  line-height: 1.4;
+  margin-top: 40px;
+}
+.content h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 3px;
+  background: #3a7a3a;
+  border-radius: 1px;
+}
+.content small {
+  display: block;
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 5px;
+}
+.content div {
+  margin-top: 15px;
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+.empty-tip {
+  margin-top: 30px;
+  color: #aaa;
+  text-align: center;
+}
+
+footer {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #d8ebd8;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+/* ===== 手机端位置调整（仅布局与留白） ===== */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 14px;
+  }
+
+  header {
+    margin-bottom: 22px;
+  }
+
+  .avatar {
+    width: 78px;
+    height: 78px;
+    border-width: 3px;
+  }
+
+  .site-title {
+    font-size: 1.55rem;
+    margin-top: 10px;
+    letter-spacing: 1px;
+  }
+
+  .main {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .sidebar {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .sidebar h2 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
+
+  #articleList li {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+  }
+
+  .content {
+    padding: 18px 14px;
+    border-radius: 12px;
+  }
+
+  .content h2 {
+    font-size: 1.2rem;
+    margin-top: 36px;
+    padding-bottom: 8px;
+  }
+
+  .back-button {
+    top: 14px;
+    left: 14px;
+    padding: 6px 10px;
+    font-size: 1rem;
+  }
+
+  .content div {
+    font-size: 0.92rem;
+    line-height: 1.65;
+  }
+
+  footer {
+    margin-top: 30px;
+    padding-top: 16px;
+    font-size: 0.82rem;
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="glow-bg"></div>
+<canvas id="bg-canvas"></canvas>
+
+<div class="container">
+  <header>
+    <div class="avatar-container">
+      <img
+        class="avatar"
+        id="avatar"
+        src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEUd0pqEvcF2G-Sfzg1X26qCMLnoyPngwACkSgAAj_wmVRNV9_-VeEoMjsE.png"
+        alt="墨渊Maris头像"
+      >
+    </div>
+    <h1 class="site-title">墨渊Maris小站</h1>
+  </header>
+
+  <div class="main">
+    <aside class="sidebar">
+      <h2>视频列表</h2>
+      <ul id="articleList"></ul>
+    </aside>
+
+    <section class="content">
+      <button class="back-button" id="backButton"><</button>
+      <div class="empty-tip" id="emptyTip">（点击左侧文章查看详情）</div>
+      <div id="articleDetail" style="display: none;">
+        <h2 id="articleTitle"></h2>
+        <small id="articleDate"></small>
+        <div id="articleContent"></div>
+      </div>
+    </section>
+  </div>
+
+  <footer>© 2026 墨渊Maris小站 · 保留所有权利</footer>
+</div>
+
+<script>
+/* ===== 头像彩蛋 ===== */
+const avatar = document.getElementById('avatar');
+let spinCount = 0;
+let fallCount = 0;
+let spinTriggered = false;
+let fallTriggered = false;
+
+avatar.addEventListener('click', () => {
+  if (fallTriggered) return;
+
+  spinCount++;
+  fallCount++;
+
+  if (spinCount >= 7 && !spinTriggered) {
+    spinTriggered = true;
+    avatar.classList.add('spin');
+    avatar.addEventListener('animationend', () => {
+      avatar.classList.remove('spin');
+    }, { once: true });
+  }
+
+  if (fallCount >= 49 && !fallTriggered) {
+    fallTriggered = true;
+    avatar.classList.remove('spin');
+    avatar.classList.add('fall');
+  }
+});
+
+/* ===== 光晕跟随 ===== */
+const glow = document.getElementById('glow-bg');
+document.addEventListener('mousemove', e => {
+  glow.style.setProperty('--x', e.clientX + 'px');
+  glow.style.setProperty('--y', e.clientY + 'px');
+});
+
+/* ===== 几何背景 ===== */
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let width, height;
+const shapes = [];
+
+function resize() {
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+class Shape {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * width;
+    this.y = Math.random() * height;
+    this.size = 15 + Math.random() * 25;
+    this.speedX = (Math.random() - 0.5) * 1.2;
+    this.speedY = (Math.random() - 0.5) * 1.2;
+    this.type = Math.floor(Math.random() * 3);
+    this.alpha = 0.06 + Math.random() * 0.06;
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    const bf = 0.98;
+    if (this.x <= 0) { this.x = 0; this.speedX *= -bf; }
+    if (this.x + this.size >= width) { this.x = width - this.size; this.speedX *= -bf; }
+    if (this.y <= 0) { this.y = 0; this.speedY *= -bf; }
+    if (this.y + this.size >= height) { this.y = height - this.size; this.speedY *= -bf; }
+    if (Math.abs(this.speedX) < 0.1) this.speedX = 0.1 * Math.sign(this.speedX || 1);
+    if (Math.abs(this.speedY) < 0.1) this.speedY = 0.1 * Math.sign(this.speedY || 1);
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(100,190,120,${this.alpha})`;
+    ctx.lineWidth = 1;
+    if (this.type === 0) {
+      ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+    } else if (this.type === 1) {
+      ctx.rect(this.x, this.y, this.size, this.size);
+    } else {
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(this.x + this.size, this.y);
+      ctx.lineTo(this.x + this.size / 2, this.y - this.size);
+      ctx.closePath();
+    }
+    ctx.stroke();
+  }
+}
+
+for (let i = 0; i < 35; i++) shapes.push(new Shape());
+function animate() {
+  ctx.clearRect(0, 0, width, height);
+  shapes.forEach(s => { s.update(); s.draw(); });
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* ===== 文章逻辑 ===== */
+let articles = [];
+
+const articleList = document.getElementById('articleList');
+const emptyTip = document.getElementById('emptyTip');
+const articleDetail = document.getElementById('articleDetail');
+const articleTitle = document.getElementById('articleTitle');
+const articleDate = document.getElementById('articleDate');
+const articleContent = document.getElementById('articleContent');
+const backButton = document.getElementById('backButton');
+
+function loadArticles() {
+  articleList.innerHTML = '';
+  articles.forEach(article => {
+    const li = document.createElement('li');
+    li.textContent = article.title;
+    li.dataset.id = article.id;
+    articleList.appendChild(li);
+  });
+}
+
+articleList.addEventListener('click', e => {
+  const id = parseInt(e.target.dataset.id);
+  if (!id) return;
+
+  const article = articles.find(a => a.id === id);
+  if (!article) return;
+
+  emptyTip.style.display = 'none';
+  articleDetail.style.display = 'block';
+  backButton.style.display = 'block';
+
+  articleTitle.textContent = article.title;
+  articleDate.textContent = article.date;
+  articleContent.innerHTML = article.content.replace(/\n/g, '<br>');
+});
+
+backButton.addEventListener('click', () => {
+  articleDetail.style.display = 'none';
+  emptyTip.style.display = 'block';
+  backButton.style.display = 'none';
+});
+
+fetch('articles.json')
+  .then(response => response.json())
+  .then(data => {
+    articles = data;
+    loadArticles();
+  })
+  .catch(error => {
+    console.error('加载文章失败:', error);
+    articleList.innerHTML = '<li>加载文章失败，请检查 articles.json 文件是否存在。</li>';
+  });
+</script>
+</body>
+</html>
