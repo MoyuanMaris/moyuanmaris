@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="墨渊Maris 的个人小站">
+<meta name="theme-color" content="#f4f9f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121913" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="墨渊Maris小站">
+<meta property="og:description" content="心之所向">
+<meta property="og:image" content="assets/avatar.png">
+<meta name="twitter:card" content="summary">
+<title>墨渊Maris小站</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- 动态背景（光晕 / 几何特效） -->
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<a class="skip-link" href="#view">跳到正文</a>
+
+<!-- 阅读进度 -->
+<div class="progress" id="readProgress" aria-hidden="true"></div>
+
+<!-- ============ 顶栏 ============ -->
+<header class="topbar" id="topbar">
+  <div class="container topbar-inner">
+    <a class="brand" href="#/">
+      <span class="brand-mark" id="brandMark"></span>
+      <span class="brand-name" id="brandName">墨渊Maris</span>
+    </a>
+    <nav class="nav" id="siteNav" aria-label="主导航"></nav>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="切换浅色 / 深色主题" title="切换主题">
+      <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+        <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5z"
+              fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      </svg>
+      <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/>
+        </g>
+      </svg>
+    </button>
+    <button class="icon-btn nav-toggle" id="navToggle" type="button" aria-label="展开菜单">☰</button>
+  </div>
+</header>
+
+<!-- ============ 内容 ============ -->
+<main class="container" id="view" tabindex="-1">
+  <div class="loading"><span class="spinner"></span><span>正在读取文章…</span></div>
+</main>
+
+<!-- ============ 页脚 ============ -->
+<footer class="site-footer">
+  <div class="container">
+    <p id="footerMain"></p>
+    <p id="footerNote"></p>
+  </div>
+</footer>
+
+<button class="back-btn" id="backBtn" type="button" title="返回上一页" aria-label="返回上一页">
+  <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+    <path d="M14.5 5.5 8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+<button class="to-top" id="toTop" type="button" title="回到顶部" aria-label="回到顶部">
+  <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+    <path d="M12 19V6M6 12l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+<!-- 轻提示 -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- 图片放大 -->
+<div class="lightbox" id="lightbox" hidden>
+  <img id="lightboxImg" alt="">
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/markdown.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+<script src="js/fx.js"></script>
+</body>
+</html>
